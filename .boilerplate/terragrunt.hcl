@@ -23,7 +23,6 @@ locals {
 include "root" {
   path = find_in_parent_folders("{{ .RootFileName }}")
 }
-
 {{ if .mongoatlas_users }}
 dependency "mongoatlas_users" {
   config_path = "{{ .mongoatlas_users_path }}"
@@ -33,7 +32,6 @@ dependency "mongoatlas_users" {
   }
 }
 {{ end }}
-
 terraform {
   source = "{{ .sourceUrl }}"
 }
@@ -42,19 +40,18 @@ inputs = {
   is_hub     = {{ .is_hub }}
   org        = local.env_vars.org
   spoke_def  = local.spoke_vars.spoke
-  {{- if .mongoatlas_users }}
-  connections = dependency.mongoatlas_users.outputs.hoop_connections
-  {{- end }}
   {{- range .requiredVariables }}
   {{- if ne .Name "org" }}
-  {{- if not (eq .Name "connections") }}
   {{ .Name }} = local.local_vars.{{ .Name }}
   {{- end }}
   {{- end }}
-  {{- end }}
   {{- range .optionalVariables }}
-  {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" "connections") }}
+  {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" ) }}
+  {{- if and .mongoatlas_users (eq .Name "connections") }}
+  connections = dependency.mongoatlas_users.outputs.hoop_connections
+  {{- else }}
   {{ .Name }} = try(local.local_vars.{{ .Name }}, {{ .DefaultValue }})
+  {{- end }}
   {{- end }}
   {{- end }}
   extra_tags = local.tags
