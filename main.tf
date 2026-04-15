@@ -25,7 +25,7 @@ resource "hoop_connection" "this" {
   access_mode_exec     = try(each.value.access_modes.exec, "enabled")
   access_mode_runbooks = try(each.value.access_modes.runbooks, "enabled")
   access_schema        = try(each.value.access_modes.schema, "enabled")
-  tags                 = merge(local.all_tags, each.value.tags)
+  tags                 = each.value.tags # Hoop Tag Limit of 10 may give problems merging with local.all_tags, excluding.
 
   lifecycle {
     ignore_changes = [command]

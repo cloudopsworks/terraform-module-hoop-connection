@@ -62,8 +62,8 @@ already resolved by the calling module — and provisions the following resource
   connection by name rather than creating a new one.
 - **Access control**: pass one or more group names in `access_control` to bind the connection
   to the `access_control` Hoop plugin.
-- **Tag merging**: module-level tags (`local.all_tags`) are merged with per-connection tags
-  automatically.
+- **Per-connection tags**: tags are applied directly from each connection definition without
+  module-level tag merging (Hoop.dev has a 10-tag limit per resource).
 - **Flexible access modes**: each of `connect`, `exec`, `runbooks`, and `schema` can be
   individually set to `enabled` or `disabled`.
 
