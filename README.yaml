@@ -1,37 +1,174 @@
-name: Terraform Transit Gateway Module
+name: Terraform Hoop.dev Connection Management Module
 #logo: logo/logo.jpg
 badges:
   - name: Latest Release
-    image: https://img.shields.io/github/release/<owner/repo>.svg?style=for-the-badge
-    url: https://github.com/<owner/repo>/releases/latest
+    image: https://img.shields.io/github/release/cloudopsworks/terraform-module-hoop-connection.svg?style=for-the-badge
+    url: https://github.com/cloudopsworks/terraform-module-hoop-connection/releases/latest
   - name: Last Updated
-    image: https://img.shields.io/github/last-commit/<owner/repo>.svg?style=for-the-badge
-    url: https://github.com/<owner/repo>/commits
+    image: https://img.shields.io/github/last-commit/cloudopsworks/terraform-module-hoop-connection.svg?style=for-the-badge
+    url: https://github.com/cloudopsworks/terraform-module-hoop-connection/commits
 
 license: "APACHE2"
 
 copyrights:
   - name: "Cloud Ops Works LLC"
     url: "https://cloudopsworks.co"
-    year: "2026"
+    year: "2024"
 
-github_repo: <owner/repo>
+github_repo: cloudopsworks/terraform-module-hoop-connection
 
 description: |-
-  <description>
+  Generic Hoop.dev connection management module that provisions `hoop_connection` and
+  `hoop_plugin_connection` resources for multiple connections. Designed to be consumed by
+  cloud-specific modules (e.g., AWS MongoDB Atlas user modules) that supply cloud-specific
+  secret references already embedded in the connections map.
 
 # Introduction to the project
 introduction: |-
-#  This is an introduction.
+  This module manages [Hoop.dev](https://hoop.dev) connections generically. It accepts a map
+  of connection definitions — with cloud-specific secret references (e.g., `_aws:secret-name:key`)
+  already resolved by the calling module — and provisions the following resources for each entry:
+
+  - `hoop_connection` — the core connection resource (type, subtype, secrets, access modes, tags).
+  - `hoop_plugin_connection` — optional access-control plugin binding, created only when
+    `access_control` groups are specified.
+
+  **Key capabilities:**
+
+  - **Import support**: set `import: true` on any connection entry to import an existing Hoop
+    connection by name rather than creating a new one.
+  - **Access control**: pass one or more group names in `access_control` to bind the connection
+    to the `access_control` Hoop plugin.
+  - **Tag merging**: module-level tags (`local.all_tags`) are merged with per-connection tags
+    automatically.
+  - **Flexible access modes**: each of `connect`, `exec`, `runbooks`, and `schema` can be
+    individually set to `enabled` or `disabled`.
 
 # How to use this project
 usage: |-
+  ```hcl
+  # terragrunt.hcl
+  terraform {
+    source = "git::https://github.com/cloudopsworks/terraform-module-hoop-connection.git//?ref=v1.0.0"
+  }
+
+  locals {
+    local_vars = read_terragrunt_config(find_in_parent_folders(".boilerplate/inputs.yaml"))
+  }
+
+  inputs = merge(
+    local.local_vars.locals,
+    {
+      connections = {
+        my-mongodb = {
+          name     = "prod-mongodb-atlas"
+          agent_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          type     = "database"
+          subtype  = "mongodb"
+          secrets = {
+            "envvar:CONNECTION_STRING" = "_aws:prod/mongodb/atlas:connection_string"
+          }
+          access_modes = {
+            connect  = "enabled"
+            exec     = "enabled"
+            runbooks = "enabled"
+            schema   = "enabled"
+          }
+          tags = {
+            environment = "production"
+            team        = "platform"
+          }
+          access_control = ["platform-engineers", "dba-team"]
+          import         = false
+        }
+      }
+    }
+  )
+  ```
 
 # Example usage
 examples: |-
+  ### Simple — single database connection, no access control
+
+  ```hcl
+  inputs = {
+    connections = {
+      analytics-db = {
+        name     = "analytics-postgresql"
+        agent_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        type     = "database"
+        subtype  = "postgresql"
+        secrets = {
+          "envvar:HOST"     = "_aws:analytics/db:host"
+          "envvar:PORT"     = "_aws:analytics/db:port"
+          "envvar:USER"     = "_aws:analytics/db:username"
+          "envvar:PASSWORD" = "_aws:analytics/db:password"
+        }
+      }
+    }
+  }
+  ```
+
+  ### Advanced — multiple connections with access control and import
+
+  ```hcl
+  inputs = {
+    connections = {
+      prod-mongo = {
+        name     = "prod-mongodb"
+        agent_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        type     = "database"
+        subtype  = "mongodb"
+        secrets = {
+          "envvar:CONNECTION_STRING" = "_aws:prod/mongo:connection_string"
+        }
+        access_control = ["sre-team", "backend-engineers"]
+        import         = false
+      }
+      legacy-mysql = {
+        name     = "legacy-mysql"
+        agent_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        type     = "database"
+        subtype  = "mysql"
+        secrets = {
+          "envvar:HOST"     = "_aws:legacy/mysql:host"
+          "envvar:USER"     = "_aws:legacy/mysql:user"
+          "envvar:PASSWORD" = "_aws:legacy/mysql:password"
+        }
+        access_modes = {
+          connect  = "enabled"
+          exec     = "disabled"
+          runbooks = "enabled"
+          schema   = "disabled"
+        }
+        access_control = ["dba-team"]
+        import         = true   # import existing connection instead of creating
+      }
+    }
+  }
+  ```
 
 # How to get started quickly
 quickstart: |-
+  1. **Obtain Hoop agent UUID** from your Hoop.dev organization settings.
+
+  2. **Prepare secrets** in your cloud provider (e.g., AWS Secrets Manager) and note the
+     secret references using the `_aws:<secret-name>:<key>` format.
+
+  3. **Reference this module** from your cloud-specific Terragrunt layer (e.g., an
+     `aws-users` module that outputs connection maps with secrets already resolved).
+
+  4. **Configure `.boilerplate/inputs.yaml`** with your connection definitions following
+     the structure in the `connections` variable.
+
+  5. **Run Terragrunt**:
+     ```sh
+     terragrunt init
+     terragrunt plan
+     terragrunt apply
+     ```
+
+  6. **Verify** connections appear in your Hoop.dev dashboard under the correct agent.
 
 include:
   - "docs/targets.md"
