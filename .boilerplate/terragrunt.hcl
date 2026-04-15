@@ -47,7 +47,7 @@ inputs = {
   {{- end }}
   {{- range .optionalVariables }}
   {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" ) }}
-  {{- if and .mongoatlas_users (eq .Name "connections") }}
+  {{- if and $.mongoatlas_users (eq .Name "connections") }}
   connections = dependency.mongoatlas_users.outputs.hoop_connections
   {{- else }}
   {{ .Name }} = try(local.local_vars.{{ .Name }}, {{ .DefaultValue }})
