@@ -26,7 +26,9 @@
 #       exec: "enabled"       # (Optional) Exec mode. Allowed: enabled, disabled. Default: "enabled".
 #       runbooks: "enabled"   # (Optional) Runbooks mode. Allowed: enabled, disabled. Default: "enabled".
 #       schema: "enabled"     # (Optional) Schema mode. Allowed: enabled, disabled. Default: "enabled".
-#     tags:                   # (Optional) Free-form tags merged with module-level tags. Default: {}.
+#     tags:                   # (Optional) Free-form tags for the connection. Default: {}.
+#                             #   NOTE: Tags are NOT merged with module-level tags due to Hoop.dev's
+#                             #   10-tag limit per resource. Only tags defined here are applied.
 #       environment: "production"
 #     access_control:         # (Optional) Hoop access_control plugin group names. Default: [].
 #       - "group-name"
