@@ -1,41 +1,34 @@
-# Module configuration
-# connections: (Optional) Map of Hoop.dev connection definitions to provision. Default: {}
-# Each key is a unique identifier for the connection within this Terragrunt deployment.
+##
+# Module-specific inputs for the Hoop.dev Connection module.
+# These values are loaded by terragrunt.hcl as local.local_vars.
 #
-# connections = {
-#   <connection_key> = {
-#     name     = "my-connection"   # (Required) Unique connection name in Hoop.dev.
-#     agent_id = "uuid"            # (Required) Hoop agent UUID (from Hoop.dev org settings).
-#     type     = "database"        # (Required) Connection type. Allowed: database, application, custom.
-#
-#     subtype = "mongodb"          # (Optional) Connection subtype. Default: null.
-#                                  #   database subtypes: mysql, postgresql, sqlserver, oracle,
-#                                  #                      mongodb, redis, redshift
-#                                  #   application subtypes: ssh, rdp
-#
-#     secrets = {                  # (Optional) Secret env vars map. Default: null.
-#                                  #   Key format: "envvar:VAR_NAME" or "filesystem:PATH"
-#                                  #   Value format: "_aws:<secret-name>:<json-key>" (AWS Secrets Manager)
-#       "envvar:CONNECTION_STRING" = "_aws:my-secret:connection_string"
-#     }
-#
-#     access_modes = {             # (Optional) Per-mode access configuration. Default: all enabled.
-#       connect  = "enabled"       # (Optional) Connect mode. Allowed: enabled, disabled. Default: "enabled".
-#       exec     = "enabled"       # (Optional) Exec mode. Allowed: enabled, disabled. Default: "enabled".
-#       runbooks = "enabled"       # (Optional) Runbooks mode. Allowed: enabled, disabled. Default: "enabled".
-#       schema   = "enabled"       # (Optional) Schema mode. Allowed: enabled, disabled. Default: "enabled".
-#     }
-#
-#     tags = {                     # (Optional) Free-form tags merged with module-level tags. Default: {}.
-#       environment = "production"
-#       team        = "platform"
-#     }
-#
-#     access_control = [           # (Optional) Hoop access_control plugin group names. Default: [].
-#                                  #   When non-empty, a hoop_plugin_connection resource is created.
-#       "group-name",
-#     ]
-#
-#     import = false               # (Optional) Import existing Hoop connection instead of creating. Default: false.
-#   }
-# }
+# NOTE: When boilerplate.yml `mongoatlas_users: true`, connections are
+# automatically sourced from the upstream mongoatlas-*-users module's
+# `hoop_connections` output and this file does not need to define them.
+##
+
+# connections:            # (Optional) Map of Hoop.dev connection definitions. Default: {}.
+#                         # When `mongoatlas_users: true` in boilerplate.yml, this is
+#                         # automatically sourced from the upstream module output.
+#   <connection_key>:
+#     name: "my-connection"   # (Required) Unique connection name in Hoop.dev.
+#     agent_id: "uuid"        # (Required) Hoop agent UUID from Hoop.dev org settings.
+#     type: "database"        # (Required) Connection type. Allowed: database, application, custom.
+#     subtype: "mongodb"      # (Optional) Connection subtype. Default: null.
+#                             #   database: mysql, postgresql, sqlserver, oracle, mongodb, redis, redshift
+#                             #   application: ssh, rdp
+#     secrets:                # (Optional) Secret env vars map. Default: null.
+#                             #   Key format: "envvar:VAR_NAME" or "filesystem:PATH"
+#                             #   Value format: "_envs/aws/<secret>#<key>", "_envs/gcp/<secret>", "_envs/azure/<secret>"
+#       "envvar:CONNECTION_STRING": "_envs/aws:my-secret#connection_string"
+#     access_modes:           # (Optional) Per-mode access configuration. Default: all enabled.
+#       connect: "enabled"    # (Optional) Connect mode. Allowed: enabled, disabled. Default: "enabled".
+#       exec: "enabled"       # (Optional) Exec mode. Allowed: enabled, disabled. Default: "enabled".
+#       runbooks: "enabled"   # (Optional) Runbooks mode. Allowed: enabled, disabled. Default: "enabled".
+#       schema: "enabled"     # (Optional) Schema mode. Allowed: enabled, disabled. Default: "enabled".
+#     tags:                   # (Optional) Free-form tags merged with module-level tags. Default: {}.
+#       environment: "production"
+#     access_control:         # (Optional) Hoop access_control plugin group names. Default: [].
+#       - "group-name"
+#     import: false           # (Optional) Import existing Hoop connection. Default: false.
+connections: {}

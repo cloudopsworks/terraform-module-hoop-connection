@@ -23,7 +23,15 @@ locals {
 include "root" {
   path = find_in_parent_folders("{{ .RootFileName }}")
 }
-
+{{ if .mongoatlas_users }}
+dependency "mongoatlas_users" {
+  config_path = "{{ .mongoatlas_users_path }}"
+  mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
+  mock_outputs = {
+    hoop_connections = {}
+  }
+}
+{{ end }}
 terraform {
   source = "{{ .sourceUrl }}"
 }
@@ -38,8 +46,12 @@ inputs = {
   {{- end }}
   {{- end }}
   {{- range .optionalVariables }}
-  {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org") }}
+  {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" ) }}
+  {{- if and .mongoatlas_users (eq .Name "connections") }}
+  connections = dependency.mongoatlas_users.outputs.hoop_connections
+  {{- else }}
   {{ .Name }} = try(local.local_vars.{{ .Name }}, {{ .DefaultValue }})
+  {{- end }}
   {{- end }}
   {{- end }}
   extra_tags = local.tags

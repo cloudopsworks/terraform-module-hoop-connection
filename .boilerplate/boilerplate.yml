@@ -20,6 +20,16 @@ variables:
     type: map
     default: {}
   # End - Generic Boilerplate Variables Setup
+  - name: mongoatlas_users
+    order: 2
+    description: "MongoDB Atlas Users dependency is enabled? When true, connections are read from the upstream module output."
+    type: bool
+    default: false
+  - name: mongoatlas_users_path
+    order: 3
+    description: "Path to mongoatlas-*-users module, required if mongoatlas_users is true"
+    type: string
+    default: "../mongoatlas-users"
 
 hooks:
   after:
