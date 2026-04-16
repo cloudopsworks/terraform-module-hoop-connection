@@ -23,9 +23,9 @@ locals {
 include "root" {
   path = find_in_parent_folders("{{ .RootFileName }}")
 }
-{{ if .mongoatlas_users }}
-dependency "mongoatlas_users" {
-  config_path = "{{ .mongoatlas_users_path }}"
+{{ if .dependency_module }}
+dependency "${{ .dependency_module_name }}" {
+  config_path = "{{ .dependency_module_path }}"
   mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
   mock_outputs = {
     hoop_connections = {}
@@ -47,8 +47,8 @@ inputs = {
   {{- end }}
   {{- range .optionalVariables }}
   {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" ) }}
-  {{- if and $.mongoatlas_users (eq .Name "connections") }}
-  connections = dependency.mongoatlas_users.outputs.hoop_connections
+  {{- if and $.dependency_module (eq .Name "connections") }}
+  connections = dependency.${{ $.dependency_module_name }}.outputs.hoop_connections
   {{- else }}
   {{ .Name }} = try(local.local_vars.{{ .Name }}, {{ .DefaultValue }})
   {{- end }}

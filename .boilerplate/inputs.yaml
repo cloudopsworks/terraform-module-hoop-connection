@@ -2,13 +2,23 @@
 # Module-specific inputs for the Hoop.dev Connection module.
 # These values are loaded by terragrunt.hcl as local.local_vars.
 #
-# NOTE: When boilerplate.yml `mongoatlas_users: true`, connections are
-# automatically sourced from the upstream mongoatlas-*-users module's
-# `hoop_connections` output and this file does not need to define them.
+# NOTE: When boilerplate.yml `dependency_module: true`, connections are
+# automatically sourced from the upstream module's `hoop_connections` output
+# (the module at `dependency_module_path` with name `dependency_module_name`)
+# and this file does not need to define them.
 ##
 
+# dependency_module: false      # (Optional) Enable upstream module dependency. Default: false.
+#                               # When true, connections are sourced from the upstream module output.
+# dependency_module_path: "../source-module"  # (Optional) Path to compatible `hoop_connections`
+#                               # output module. Required if dependency_module is true.
+#                               # Default: "../source-module"
+# dependency_module_name: "source_module"     # (Optional) Name of compatible `hoop_connections`
+#                               # output module. Required if dependency_module is true.
+#                               # Default: "source_module"
+
 # connections:            # (Optional) Map of Hoop.dev connection definitions. Default: {}.
-#                         # When `mongoatlas_users: true` in boilerplate.yml, this is
+#                         # When `dependency_module: true` in boilerplate.yml, this is
 #                         # automatically sourced from the upstream module output.
 #   <connection_key>:
 #     name: "my-connection"   # (Required) Unique connection name in Hoop.dev.
