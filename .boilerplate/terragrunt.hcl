@@ -48,7 +48,7 @@ inputs = {
   {{- range .optionalVariables }}
   {{- if not (eq .Name "extra_tags" "is_hub" "spoke_def" "org" ) }}
   {{- if and $.dependency_module (eq .Name "connections") }}
-  connections = dependency.${{ $.dependency_module_name }}.outputs.hoop_connections
+  connections = dependency.{{ $.dependency_module_name }}.outputs.hoop_connections
   {{- else }}
   {{ .Name }} = try(local.local_vars.{{ .Name }}, {{ .DefaultValue }})
   {{- end }}
