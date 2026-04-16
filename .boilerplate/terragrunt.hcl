@@ -24,7 +24,7 @@ include "root" {
   path = find_in_parent_folders("{{ .RootFileName }}")
 }
 {{ if .dependency_module }}
-dependency "${{ .dependency_module_name }}" {
+dependency "{{ .dependency_module_name }}" {
   config_path = "{{ .dependency_module_path }}"
   mock_outputs_allowed_terraform_commands = ["validate", "destroy"]
   mock_outputs = {
