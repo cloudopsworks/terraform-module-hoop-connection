@@ -9,7 +9,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_hoop"></a> [hoop](#provider\_hoop) | 0.0.19 |
+| <a name="provider_hoop"></a> [hoop](#provider\_hoop) | ~> 0.0.18 |
 
 ## Modules
 
