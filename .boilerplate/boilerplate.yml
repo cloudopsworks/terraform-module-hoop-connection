@@ -14,27 +14,32 @@ variables:
     description: "Is this a hub configuration?"
     type: bool
     default: false
+    confirm: true
   - name: tags
     order: 1
     description: "Tags"
     type: map
     default: {}
+    confirm: true
   # End - Generic Boilerplate Variables Setup
   - name: dependency_module
     order: 2
     description: "Hoop Connection dependency is enabled? When true, connections are read from the upstream module output."
     type: bool
     default: false
+    confirm: true
   - name: dependency_module_path
     order: 3
     description: "Path to compatible `hoop_connections` output module, required if dependency_module is true"
     type: string
     default: "../source-module"
+    confirm: true
   - name: dependency_module_name
     order: 4
     description: "Name of compatible `hoop_connections` output module, required if dependency_module is true"
     type: string
     default: "source_module"
+    confirm: true
 
 hooks:
   after:
